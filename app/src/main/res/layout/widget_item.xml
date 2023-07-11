@@ -1,0 +1,102 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Giiku06Application.AppWidget.Container"
+    android:background="@drawable/shape_rounded_bord_sub"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:padding="0dp"
+    android:theme="@style/Theme.Giiku06Application.AppWidgetContainer">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Widget.Giiku06Application.AppWidget.Container"
+        android:background="@drawable/shape_rounded_corners_bord"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:padding="8dp"
+        android:layout_centerInParent="true"
+        android:theme="@style/Theme.Giiku06Application.AppWidgetContainer">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:gravity="center"
+            android:padding="0dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="52dp"
+                android:background="@null"
+                android:scaleType="fitXY"
+                android:src="@drawable/next_prev" />
+
+            <TextView
+                android:id="@+id/ride_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:textColor="@color/black"
+                android:textSize="20dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="4dp"
+                android:background="@drawable/shape_rounded_corners_times"
+                android:text="12 : 21" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/route_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:text="鶴舞線"
+                    android:layout_gravity="center"
+                    android:textColor="@color/white"/>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp">
+
+                    <ImageView
+                        android:background="@null"
+                        android:layout_width="140dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center_vertical"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/stationbord" />
+
+                    <TextView
+                        android:id="@+id/last_station_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_centerInParent="true"
+                        android:background="@null"
+                        android:text="赤池行"
+                        android:textColor="#DDEEDD"
+                        android:textSize="20dp" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/drop_off_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/shape_rounded_corners_times"
+                android:padding="8dp"
+                android:text="18 : 52"
+                android:textColor="@color/black"
+                android:textSize="20dp" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</RelativeLayout>
