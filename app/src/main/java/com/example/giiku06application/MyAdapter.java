@@ -5,6 +5,8 @@ import static android.widget.RemoteViewsService.*;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -15,7 +17,6 @@ public class MyAdapter implements RemoteViewsService.RemoteViewsFactory {
     public MyAdapter(Context context, String[] dataSource) {
         this.context = context;
         this.dataSource = dataSource;
-        Log.d("TAG", "MyAdapter: "+dataSource);
     }
 
     @Override
