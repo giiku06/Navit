@@ -32,6 +32,7 @@
                 android:src="@drawable/next_prev" />
 
             <TextView
+                android:id="@+id/ride_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -48,6 +49,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/route_text"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
                     android:text="鶴舞線"
@@ -67,6 +69,7 @@
                         android:src="@drawable/stationbord" />
 
                     <TextView
+                        android:id="@+id/last_station_text"
                         android:layout_width="wrap_content"
                         android:layout_height="36dp"
                         android:layout_centerInParent="true"
@@ -80,6 +83,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/drop_off_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
