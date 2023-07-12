@@ -5,17 +5,24 @@ import static android.widget.RemoteViewsService.*;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 public class MyAdapter implements RemoteViewsService.RemoteViewsFactory {
     private final Context context;
-    private final String[] dataSource;
+    private final String[] ride_time;
+    private final String[] drop_off_time;
+    private final String[] route_text;
+    private final String[] last_station_text;
 
-    public MyAdapter(Context context, String[] dataSource) {
+    public MyAdapter(Context context, String[] ride_time, String[] drop_off_time, String[] route_text, String[] last_station_text) {
         this.context = context;
-        this.dataSource = dataSource;
-        Log.d("TAG", "MyAdapter: "+dataSource);
+        this.ride_time = ride_time;
+        this.drop_off_time = drop_off_time;
+        this.route_text = route_text;
+        this.last_station_text = last_station_text;
     }
 
     @Override
@@ -36,7 +43,7 @@ public class MyAdapter implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        return dataSource.length;
+        return last_station_text.length;
     }
 
     @Override
@@ -44,7 +51,10 @@ public class MyAdapter implements RemoteViewsService.RemoteViewsFactory {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_item);
 
         // データソースから必要な情報を取得し、ビューに設定
-        remoteViews.setTextViewText(R.id.last_station_text,dataSource[position]);
+        remoteViews.setTextViewText(R.id.ride_time,ride_time[position]);
+        remoteViews.setTextViewText(R.id.drop_off_time,drop_off_time[position]);
+        remoteViews.setTextViewText(R.id.route_text,route_text[position]);
+        remoteViews.setTextViewText(R.id.last_station_text,last_station_text[position]);
 
         return remoteViews;
     }
