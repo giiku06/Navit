@@ -17,7 +17,7 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String API_HOST = "https://navitime-transport.p.rapidapi.com/transport_node/around?coord=35.166816%2C136.952957&limit=2&term=60&datum=wgs84&coord_unit=degree&walk_speed=5";
+    private static final String API_HOST = "navitime-transport.p.rapidapi.com";
     private static final String API_KEY = "ee6978f011mshb71e6fca9594701p1c2bcbjsn3aa55c5144d5";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +27,10 @@ public class MainActivity extends AppCompatActivity {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://navitime-transport.p.rapidapi.com/transport_node/id?id=00005077&datum=wgs84&coord_unit=degree")
+                .url("https://navitime-transport.p.rapidapi.com/transport_node/around?coord=35.166816%2C136.952957&limit=2&term=60&datum=wgs84&coord_unit=degree&walk_speed=5")
                 .get()
-                .addHeader("X-RapidAPI-Key", "ee6978f011mshb71e6fca9594701p1c2bcbjsn3aa55c5144d5")
-                .addHeader("X-RapidAPI-Host", "navitime-transport.p.rapidapi.com")
+                .addHeader("X-RapidAPI-Key", API_KEY)
+                .addHeader("X-RapidAPI-Host", API_HOST)
                 .build();
 
         try {
