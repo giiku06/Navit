@@ -114,12 +114,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         String latitude = String.valueOf(location.getLatitude());
         String longitude = String.valueOf(location.getLongitude());
-
+        SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("latitude", latitude);
+        editor.putString("longitude", longitude); // データを保存する
+        editor.apply();
         String goalDummy = "35.170222,136.883082";
-
-        // OkHttpGetのインスタンスを使用して処理を行う
-        OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude, goalDummy, this);
-        okHttpGet.execute();
     }
 
     @Override
