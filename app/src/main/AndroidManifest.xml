@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
 
+<!--　　GPSから位置情報を取得するためのパーミッション　　-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+<!--    ネットワークから位置情報を取得するためのパーミッション　　-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-permission android:name="android.permission.INTERNET" />
