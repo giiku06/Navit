@@ -18,11 +18,19 @@ public class OkHttpGet extends AsyncTask<String,String,String> {
     private String longitude;
     private String goalDummy;
 
-    public OkHttpGet(String currentTime, String latitude, String longitude, String goalDummy){
+    // コールバックインターフェースの定義
+    public interface OnDataReceivedListener {
+        void onDataReceived(String resData);
+    }
+
+    private OnDataReceivedListener listener;
+
+    public OkHttpGet(String currentTime, String latitude, String longitude, String goalDummy, OnDataReceivedListener listener){
         this.currentTime = currentTime;
         this.latitude = latitude;
         this.longitude = longitude;
         this.goalDummy = goalDummy;
+        this.listener = listener;
     }
 
     @Override
@@ -62,6 +70,9 @@ public class OkHttpGet extends AsyncTask<String,String,String> {
 
     @Override
     protected void onPostExecute(String resData) {
-        Log.d("DEBUG", "resData　：" + resData);
+        // 結果をコールバックする
+        if (listener != null) {
+            listener.onDataReceived(resData);
+        }
     }
 }
