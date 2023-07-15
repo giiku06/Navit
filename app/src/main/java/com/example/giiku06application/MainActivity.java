@@ -99,8 +99,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onLocationChanged(Location location) {
 //        位置情報の変更が入った時に行う処理
-        Log.d("DEBUG", "lat : " + location.getLatitude());
-        Log.d("DEBUG", "lon : " + location.getLongitude());
 
 
         // 現在時刻を取得して表示する
@@ -119,10 +117,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         String goalDummy = "35.661971,139.703795";
 
-        Log.d("DEBUG", "time : " + currentTime);
-
         // OkHttpGetのインスタンスを使用して処理を行う
         OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude, goalDummy);
+        okHttpGet.execute();
     }
 
     @Override
