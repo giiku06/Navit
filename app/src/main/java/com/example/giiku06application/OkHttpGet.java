@@ -16,8 +16,7 @@ public class OkHttpGet extends AsyncTask<String,String,String> {
     private String currentTime;
     private String latitude;
     private String longitude;
-    private String goalDummy;
-
+    private String goalPoint;
     // コールバックインターフェースの定義
     public interface OnDataReceivedListener {
         void onDataReceived(String resData);
@@ -25,19 +24,20 @@ public class OkHttpGet extends AsyncTask<String,String,String> {
 
     private OnDataReceivedListener listener;
 
-    public OkHttpGet(String currentTime, String latitude, String longitude, String goalDummy, OnDataReceivedListener listener){
+    public OkHttpGet(String currentTime, String latitude, String longitude, String goalPoint, OnDataReceivedListener listener){
         this.currentTime = currentTime;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.goalDummy = goalDummy;
+        this.goalPoint = goalPoint;
         this.listener = listener;
     }
+
 
     @Override
     protected String doInBackground(String... strings) {
         String apiUrl =
                 "https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=" + latitude + "%2C" + longitude +
-                        "&goal=" + goalDummy +
+                        "&goal=" + goalPoint +
                         "&start_time=" + currentTime +
                         "&datum=wgs84&term=1440&limit=3&coord_unit=degree";
 

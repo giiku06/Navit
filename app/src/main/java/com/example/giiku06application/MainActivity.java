@@ -12,6 +12,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
 import android.util.Log;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -24,6 +26,7 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -41,10 +44,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements LocationListener, OkHttpGet.OnDataReceivedListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, OkHttpGet.OnDataReceivedListener, GetGoalPoint.OnGoalPointReceivedListener {
 
     private LocationManager mLocationManager;
     private String bestProvider;
+    private EditText inputGoalPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,51 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         setContentView(R.layout.activity_main);
 
         initLocationManager();
+        inputGoalPoint = (EditText) findViewById(R.id.input_goal_point);
     }
+
+//    目的地付近の最寄り駅を検索
+    public void SearchPoint(View MyButton) {
+        String keyWord = inputGoalPoint.getText().toString();
+
+        if (!keyWord.isEmpty()){
+//            最寄り駅の検索をリクエスト
+            GetGoalPoint getGoalPoint = new GetGoalPoint(keyWord, this);
+            getGoalPoint.execute();
+        }
+    }
+    @Override
+    public void onGoalPointReceived(String resGoalPoint) {
+        // 受け取ったJSONデータを解析するなどの処理を行う
+        try {
+            JSONObject rootJSON = new JSONObject(resGoalPoint);
+            JSONArray itemsArray = rootJSON.getJSONArray("items");
+
+            if (itemsArray.length() > 0) {
+                JSONObject item = itemsArray.getJSONObject(0);
+                String goal_id = item.getString("id");
+                TextView errorMsg = findViewById(R.id.error_msg);
+                errorMsg.setVisibility(View.INVISIBLE);
+
+//            MainAppWidgetに値の受け渡し
+                SharedPreferences sharedGoalPoint = getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedGoalPoint.edit();
+                editor.putString("goalPoint", goal_id);
+                editor.apply();
+
+                Log.d("DEBUG", "goal_id :" + goal_id);
+            }else {
+                // itemsが空の場合の処理
+                TextView errorMsg = findViewById(R.id.error_msg);
+                errorMsg.setText("目的地周辺に駅が見つかりません");
+                errorMsg.setVisibility(View.VISIBLE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -119,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         editor.putString("latitude", latitude);
         editor.putString("longitude", longitude); // データを保存する
         editor.apply();
-        String goalDummy = "35.170222,136.883082";
     }
 
     @Override

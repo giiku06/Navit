@@ -54,11 +54,15 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
         int min = calendar.get(Calendar.MINUTE);
         int sec = calendar.get(Calendar.SECOND);
         @SuppressLint("DefaultLocale") String currentTime = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min, sec);
+//        位置情報の受け取り
         SharedPreferences sharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         String latitude = sharedPreferences.getString("latitude", "35.170222");
         String longitude = sharedPreferences.getString("longitude", "136.883082");
+//        目的地の最寄り駅のID受け取り
+        SharedPreferences sharedGoalPoint = context.getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
+        String goalPoint = sharedGoalPoint.getString("goalPoint", "00000094");
         // OkHttpGetのインスタンスを使用して処理を行う
-        OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude,  "35.170222,136.883082", this);
+        OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude, goalPoint, this);
         okHttpGet.execute();
         Log.d("onUpdate", "onUpdate: test");
         //データの格納
