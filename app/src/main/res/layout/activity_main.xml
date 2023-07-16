@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/input_goal_point"
         android:layout_marginHorizontal="20dp"
-        android:textColor="#ff0000"
+        android:textColor="#ff3300"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="138dp" />
