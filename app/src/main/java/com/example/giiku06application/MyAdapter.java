@@ -34,6 +34,7 @@ public class MyAdapter implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public void onDataSetChanged() {
         // データソースの変更があった場合に実装
+//        notifyDataSetChanged();
     }
 
     @Override

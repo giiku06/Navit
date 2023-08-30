@@ -42,10 +42,17 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
     String[] drop_off_time = {"11 : 30", "12 : 30", "13 : 30"};
     String[] route_text = {"東山線", "鶴舞線", "桜通線"};
     String[] last_station_text = {"高畑行", "上小田井行", "太閤通行"};
+    int now = 0;
+    Context context;
+    AppWidgetManager appWidgetManager;
+    int[] appWidgetIds;
     public static final String ACTION_MANUAL_UPDATE = "com.example.giiku06application.MANUAL_UPDATE";
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+        this.context = context;
+        this.appWidgetManager = appWidgetManager;
+        this.appWidgetIds = appWidgetIds;
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
@@ -64,23 +71,7 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
         // OkHttpGetのインスタンスを使用して処理を行う
         OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude, goalPoint, this);
         okHttpGet.execute();
-        Log.d("onUpdate", "onUpdate: test");
-        //データの格納
-        Bundle bundle = new Bundle();
-        bundle.putStringArray("ride_time", ride_time);
-        bundle.putStringArray("drop_off_time", drop_off_time);
-        bundle.putStringArray("route_text", route_text);
-        bundle.putStringArray("last_station_text", last_station_text);
 
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.main_app_widget);
-        Intent intent = new Intent(context, MyWidgetService.class);
-        Intent manualUpdateIntent = new Intent(context, MainAppWidget.class);
-        manualUpdateIntent.setAction(ACTION_MANUAL_UPDATE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, manualUpdateIntent, PendingIntent.FLAG_IMMUTABLE);
-        views.setOnClickPendingIntent(R.id.button_manual_update, pendingIntent);
-        intent.putExtras(bundle);
-        views.setRemoteAdapter(R.id.widget_list_view, intent);
-        appWidgetManager.updateAppWidget(appWidgetIds, views);
     }
 
     @Override
@@ -97,11 +88,24 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
         super.onReceive(context, intent);
 
         if (intent.getAction().equals(ACTION_MANUAL_UPDATE)) {
+            if (now == 2){
+                now = 0;
+            } else {
+                now++;
+            }
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.main_app_widget);
+            views.setTextViewText(R.id.ride_time, ride_time[now]);
+            views.setTextViewText(R.id.drop_off_time, drop_off_time[now]);
+            views.setTextViewText(R.id.route_text, route_text[now]);
+            views.setTextViewText(R.id.last_station_text, last_station_text[now]);
+            for (int appWidgetId : appWidgetIds) {
+                appWidgetManager.updateAppWidget(appWidgetId, views);
+            }
             // 手動更新アクションを受信した場合、onUpdateを呼び出す
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            ComponentName thisAppWidget = new ComponentName(context.getPackageName(), MainAppWidget.class.getName());
-            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-            onUpdate(context, appWidgetManager, appWidgetIds);
+//            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+//            ComponentName thisAppWidget = new ComponentName(context.getPackageName(), MainAppWidget.class.getName());
+//            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+//            onUpdate(context, appWidgetManager, appWidgetIds);
             Log.d("ACTION_MANUAL_UPDATE", "onReceive: ACTION_MANUAL_UPDATE");
         }
     }
@@ -186,6 +190,20 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
             last_station_text = goalStationNamesString.split(",");
             Log.d("ride_time", "onDataReceived: "+ride_time[0]);
 
+            //データの格納
+            Bundle bundle = new Bundle();
+            bundle.putStringArray("ride_time", ride_time);
+            bundle.putStringArray("drop_off_time", drop_off_time);
+            bundle.putStringArray("route_text", route_text);
+            bundle.putStringArray("last_station_text", last_station_text);
+
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.main_app_widget);
+            Intent intent = new Intent(context, MyWidgetService.class);
+            Intent manualUpdateIntent = new Intent(context, MainAppWidget.class);
+            intent.putExtras(bundle);
+            //アダプターにデータを送信
+            views.setRemoteAdapter(R.id.listview, intent);
+            appWidgetManager.updateAppWidget(appWidgetIds, views);
         } catch (JSONException e) {
             e.printStackTrace();
         }
