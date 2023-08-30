@@ -6,7 +6,7 @@
     android:minWidth="320dp"
     android:minHeight="40dp"
     android:previewImage="@drawable/example_appwidget_preview"
-    android:previewLayout="@layout/main_app_widget"
+    android:previewLayout="@layout/widget_item"
     android:resizeMode="none"
     android:targetCellWidth="5"
     android:targetCellHeight="1"

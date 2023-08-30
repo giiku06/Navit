@@ -8,7 +8,6 @@
     android:theme="@style/Theme.Giiku06Application.AppWidgetContainer">
 
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         style="@style/Widget.Giiku06Application.AppWidget.Container"
         android:background="@drawable/shape_rounded_corners_bord"
         android:layout_width="match_parent"
@@ -39,10 +38,10 @@
                 android:padding="8dp"
                 android:textColor="@color/black"
                 android:textSize="20dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginRight="4dp"
                 android:layout_marginLeft="4dp"
                 android:background="@drawable/shape_rounded_corners_times"
-                android:text="12 : 21" />
+                android:text="00 : 00" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -52,7 +51,7 @@
                     android:id="@+id/route_text"
                     android:layout_width="wrap_content"
                     android:layout_height="20dp"
-                    android:text="鶴舞線"
+                    android:text="ーー線"
                     android:layout_gravity="center"
                     android:textColor="@color/white"/>
 
@@ -61,8 +60,9 @@
                     android:layout_height="36dp">
 
                     <ImageView
+                        android:id="@+id/widget_item"
                         android:background="@null"
-                        android:layout_width="120dp"
+                        android:layout_width="112dp"
                         android:layout_height="36dp"
                         android:layout_gravity="center_vertical"
                         android:scaleType="fitXY"
@@ -74,7 +74,7 @@
                         android:layout_height="36dp"
                         android:layout_centerInParent="true"
                         android:background="@null"
-                        android:text="赤池行"
+                        android:text="ーー行"
                         android:textColor="#DDEEDD"
                         android:textSize="20dp" />
 
@@ -87,11 +87,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:background="@drawable/shape_rounded_corners_times"
                 android:padding="8dp"
-                android:text="18 : 52"
+                android:text="23 : 59"
                 android:textColor="@color/black"
                 android:textSize="20dp" />
 
