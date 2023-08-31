@@ -1,6 +1,7 @@
 package com.example.giiku06application;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -112,10 +113,19 @@ public class MyWidgetService extends RemoteViewsService {
             RemoteViews rv = null;
             if(jsons != null) {
                 rv = new RemoteViews(getPackageName(), R.layout.widget_item);
+
+                // データセット
                 rv.setTextViewText(R.id.ride_time,ride_time[position]);
                 rv.setTextViewText(R.id.drop_off_time,drop_off_time[position]);
                 rv.setTextViewText(R.id.route_text,route_text[position]);
                 rv.setTextViewText(R.id.last_station_text,last_station_text[position]);
+
+                // クリックイベント
+//                Context context = getApplicationContext();
+                Intent ClickIntent = new Intent("com.example.giiku06application.CLICK_WIDGET");
+                ClickIntent.putExtra("CLICK_WIDGET", position);
+
+                rv.setOnClickFillInIntent(R.id.view_item, ClickIntent);
             }
 
             return rv;
