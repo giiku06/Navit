@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -16,6 +15,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Objects;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,12 +26,6 @@ public class MyWidgetService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new NavitWidgetFactory();
-//        Bundle bundle = intent.getExtras();
-//        String[] ride_time = bundle.getStringArray("ride_time");
-//        String[] drop_off_time = bundle.getStringArray("drop_off_time");
-//        String[] route_text = bundle.getStringArray("route_text");
-//        String[] last_station_text = bundle.getStringArray("last_station_text");
-//        return new MyAdapter(this.getApplicationContext(), ride_time, drop_off_time, route_text,last_station_text);
     }
 
     private class NavitWidgetFactory implements RemoteViewsFactory {
@@ -89,11 +83,10 @@ public class MyWidgetService extends RemoteViewsService {
                         .addHeader("X-RapidAPI-Key", API_KEY)
                         .addHeader("X-RapidAPI-Host", API_HOST)
                         .build();
-                Response response = httpClient.newCall(request).execute();
-                String responseStr = response.body().string();
-                JSONObject rootJSON = new JSONObject(responseStr);
-                jsons = rootJSON.getJSONArray("items");
-                if (jsons != null){
+                try (Response response = httpClient.newCall(request).execute()) {
+                    String responseStr = Objects.requireNonNull(response.body()).string();
+                    JSONObject rootJSON = new JSONObject(responseStr);
+                    jsons = rootJSON.getJSONArray("items");
                     moldData();
                 }
             } catch (IOException | JSONException e) {
