@@ -4,33 +4,20 @@ import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.ListView;
 import android.widget.RemoteViews;
-import android.widget.RemoteViewsService;
-import android.widget.TextView;
 
-import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Calendar;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Implementation of App Widget functionality.
@@ -46,31 +33,45 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
     Context context;
     AppWidgetManager appWidgetManager;
     int[] appWidgetIds;
+    int AppWidgetId;
     public static final String ACTION_MANUAL_UPDATE = "com.example.giiku06application.MANUAL_UPDATE";
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
-        this.context = context;
-        this.appWidgetManager = appWidgetManager;
-        this.appWidgetIds = appWidgetIds;
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.DATE);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int min = calendar.get(Calendar.MINUTE);
-        int sec = calendar.get(Calendar.SECOND);
-        @SuppressLint("DefaultLocale") String currentTime = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min, sec);
-//        位置情報の受け取り
-        SharedPreferences sharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
-        String latitude = sharedPreferences.getString("latitude", "35.170222");
-        String longitude = sharedPreferences.getString("longitude", "136.883082");
-//        目的地の最寄り駅のID受け取り
-        SharedPreferences sharedGoalPoint = context.getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
-        String goalPoint = sharedGoalPoint.getString("goalPoint", "00000094");
-        // OkHttpGetのインスタンスを使用して処理を行う
-        OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude, goalPoint, this);
-        okHttpGet.execute();
+        for(int appWidgetId : appWidgetIds) {
+            Intent remoteViewsFactoryIntent = new Intent(context, MyWidgetService.class);
+            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.main_app_widget);
+            rv.setRemoteAdapter(R.id.listview, remoteViewsFactoryIntent);
+
+
+//            setOnItemSelectedPendingIntent(ctx, rv);
+//            setOnButtonClickPendingIntent(ctx, rv, appWidgetId);
+
+            appWidgetManager.updateAppWidget(appWidgetId, rv);
+        }
+
+//        Calendar calendar = Calendar.getInstance();
+//        int year = calendar.get(Calendar.YEAR);
+//        int month = calendar.get(Calendar.MONTH) + 1;
+//        int day = calendar.get(Calendar.DATE);
+//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        int min = calendar.get(Calendar.MINUTE);
+//        int sec = calendar.get(Calendar.SECOND);
+//        @SuppressLint("DefaultLocale") String currentTime = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min, sec);
+////        位置情報の受け取り
+//        SharedPreferences sharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+//        String latitude = sharedPreferences.getString("latitude", "35.170222");
+//        String longitude = sharedPreferences.getString("longitude", "136.883082");
+////        目的地の最寄り駅のID受け取り
+//        SharedPreferences sharedGoalPoint = context.getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
+//        String goalPoint = sharedGoalPoint.getString("goalPoint", "00000094");
+//        // OkHttpGetのインスタンスを使用して処理を行う
+//
+//        for (int appWidgetId : appWidgetIds) {
+//            AppWidgetId = appWidgetId;
+//            OkHttpGet okHttpGet = new OkHttpGet(currentTime, latitude, longitude, goalPoint, this);
+//            okHttpGet.execute();
+//        }
 
     }
 
@@ -86,7 +87,9 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-
+        if (intent.getAction().equals("CLICK_WIDGET")) {
+            Log.d("TAG", "onReceive: ");
+        }
         if (intent.getAction().equals(ACTION_MANUAL_UPDATE)) {
             if (now == 2){
                 now = 0;
@@ -200,6 +203,13 @@ public class MainAppWidget extends AppWidgetProvider implements OkHttpGet.OnData
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.main_app_widget);
             Intent intent = new Intent(context, MyWidgetService.class);
             Intent manualUpdateIntent = new Intent(context, MainAppWidget.class);
+
+            //各要素のクリックイベント
+            Intent ClickIntent = new Intent("CLICK_WIDGET");
+            PendingIntent pendingIntent = PendingIntent.getService(context, AppWidgetId, ClickIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+            views.setOnClickPendingIntent(R.id.listview, pendingIntent);
+
             intent.putExtras(bundle);
             //アダプターにデータを送信
             views.setRemoteAdapter(R.id.listview, intent);

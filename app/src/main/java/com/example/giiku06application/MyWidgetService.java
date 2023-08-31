@@ -1,17 +1,233 @@
 package com.example.giiku06application;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.Calendar;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 
 public class MyWidgetService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        Bundle bundle = intent.getExtras();
-        String[] ride_time = bundle.getStringArray("ride_time");
-        String[] drop_off_time = bundle.getStringArray("drop_off_time");
-        String[] route_text = bundle.getStringArray("route_text");
-        String[] last_station_text = bundle.getStringArray("last_station_text");
-        return new MyAdapter(this.getApplicationContext(), ride_time, drop_off_time, route_text,last_station_text);
+        return new NavitWidgetFactory();
+//        Bundle bundle = intent.getExtras();
+//        String[] ride_time = bundle.getStringArray("ride_time");
+//        String[] drop_off_time = bundle.getStringArray("drop_off_time");
+//        String[] route_text = bundle.getStringArray("route_text");
+//        String[] last_station_text = bundle.getStringArray("last_station_text");
+//        return new MyAdapter(this.getApplicationContext(), ride_time, drop_off_time, route_text,last_station_text);
+    }
+
+    private class NavitWidgetFactory implements RemoteViewsFactory {
+
+        private static final String TAG = "NavitViewFactory";
+        private static final String API_HOST = "navitime-route-totalnavi.p.rapidapi.com";
+        private static final String API_KEY = "ee6978f011mshb71e6fca9594701p1c2bcbjsn3aa55c5144d5";
+
+        private JSONArray jsons = new JSONArray();
+
+        //初期データの作成
+        String[] ride_time = {"11 : 00", "12 : 00", "13 : 00"};
+        String[] drop_off_time = {"11 : 30", "12 : 30", "13 : 30"};
+        String[] route_text = {"東山線", "鶴舞線", "桜通線"};
+        String[] last_station_text = {"高畑行", "上小田井行", "太閤通行"};
+
+        @Override
+        public void onCreate() {
+            Log.d(TAG, "onCreate: ");
+        }
+
+        @Override
+        public void onDataSetChanged() {
+            fetchData();
+        }
+
+        private void fetchData() {
+            Log.d(TAG, "fetchData: start fetch");
+            try {
+                Context context = getApplicationContext();
+                Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH) + 1;
+                int day = calendar.get(Calendar.DATE);
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                int min = calendar.get(Calendar.MINUTE);
+                int sec = calendar.get(Calendar.SECOND);
+                @SuppressLint("DefaultLocale") String currentTime = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min, sec);
+        //        位置情報の受け取り
+                SharedPreferences sharedPreferences = context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+                String latitude = sharedPreferences.getString("latitude", "35.170222");
+                String longitude = sharedPreferences.getString("longitude", "136.883082");
+        //        目的地の最寄り駅のID受け取り
+                SharedPreferences sharedGoalPoint = context.getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
+                String goalPoint = sharedGoalPoint.getString("goalPoint", "00000094");
+                String apiUrl =
+                        "https://navitime-route-totalnavi.p.rapidapi.com/route_transit?start=" + latitude + "%2C" + longitude +
+                                "&goal=" + goalPoint +
+                                "&start_time=" + currentTime +
+                                "&datum=wgs84&term=1440&limit=3&coord_unit=degree";
+                OkHttpClient httpClient = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url(apiUrl)
+                        .get()
+                        .addHeader("X-RapidAPI-Key", API_KEY)
+                        .addHeader("X-RapidAPI-Host", API_HOST)
+                        .build();
+                Response response = httpClient.newCall(request).execute();
+                String responseStr = response.body().string();
+                JSONObject rootJSON = new JSONObject(responseStr);
+                jsons = rootJSON.getJSONArray("items");
+                if (jsons != null){
+                    moldData();
+                }
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onDestroy() {
+
+        }
+
+        @Override
+        public int getCount() {
+            return jsons.length();
+        }
+
+        @Override
+        public RemoteViews getViewAt(int position) {
+            if(jsons.length() <= 0) {
+                return null;
+            }
+            RemoteViews rv = null;
+            if(jsons != null) {
+                rv = new RemoteViews(getPackageName(), R.layout.widget_item);
+                rv.setTextViewText(R.id.ride_time,ride_time[position]);
+                rv.setTextViewText(R.id.drop_off_time,drop_off_time[position]);
+                rv.setTextViewText(R.id.route_text,route_text[position]);
+                rv.setTextViewText(R.id.last_station_text,last_station_text[position]);
+            }
+
+            return rv;
+        }
+
+        private void moldData() {
+            try {
+                JSONArray itemsArray = jsons;
+                //            出発時刻の配列
+                String[] fromTimes = new String[itemsArray.length()];
+                //            到着時刻の配列
+                String[] toTimes = new String[itemsArray.length()];
+
+                //            路線名の配列
+                String[] lineNames = new String[itemsArray.length()];
+                //            目的地から近い最寄り駅の配列
+                String[] goalStationNames = new String[itemsArray.length()];
+
+                //            items(経路の候補)[0~2]まで回す
+                for (int i = 0; i < itemsArray.length(); i++) {
+                    JSONObject item = itemsArray.getJSONObject(i);
+                    JSONObject summary = item.getJSONObject("summary");
+                    JSONObject move = summary.getJSONObject("move");
+
+                    //                日時の取得
+                    String fromTime = move.getString("from_time");
+                    String toTime = move.getString("to_time");
+
+                    //                取得日時からhh:mmのみ切り出しフォーマット→配列に格納
+                    String formattedFromTime = fromTime.substring(11, 16);
+                    fromTimes[i] = formattedFromTime;
+                    String formattedToTime = toTime.substring(11, 16);
+                    toTimes[i] = formattedToTime;
+
+                    //                sections部
+                    JSONArray sectionsArray = item.getJSONArray("sections");
+
+                    //                路線名の抽出処理
+                    String lineName = "";
+                    for (int j = 0; j < sectionsArray.length(); j++) {
+                        JSONObject section = sectionsArray.getJSONObject(j);
+
+                        //                    section配列からtype:moveで、move:walkでないものを抽出
+                        if (section.getString("type").equals("move") &&
+                                !section.getString("move").equals("walk")) {
+                            lineName = section.getString("line_name");
+                            break; //ひとつ目が抽出出来たらループを抜ける
+                        }
+                    }
+                    lineNames[i] = lineName;
+
+                    //                目的地の最寄り駅の抽出処理
+                    String goalStationName = "";
+                    for (int j = sectionsArray.length() - 1; j >= 0; j--) {
+                        JSONObject section = sectionsArray.getJSONObject(j);
+                        //                    section配列の後ろからtype:pointで、node_idが含まれているものを検索
+                        if (section.getString("type").equals("point") && section.has("node_id")) {
+                            goalStationName = section.getString("name");
+                            break; // 抽出できたらループを抜ける
+                        }
+                    }
+                    goalStationNames[i] = goalStationName;
+
+                }
+                String fromTimesString = TextUtils.join(",", fromTimes);
+                String toTimesString = TextUtils.join(",", toTimes);
+                String lineNamesString = TextUtils.join(",", lineNames);
+                String goalStationNamesString = TextUtils.join(",", goalStationNames);
+
+                Log.d("DEBUG", "from: " + fromTimesString);
+                Log.d("DEBUG", "to: " + toTimesString);
+                Log.d("DEBUG", "line: " + lineNamesString);
+                Log.d("DEBUG", "goal: " + goalStationNamesString);
+
+                //listに渡すデータの作成
+                ride_time = fromTimesString.split(",");
+                drop_off_time = toTimesString.split(",");
+                route_text = lineNamesString.split(",");
+                last_station_text = goalStationNamesString.split(",");
+                Log.d("ride_time", "onDataReceived: " + ride_time[0]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public RemoteViews getLoadingView() {
+            return null;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 1;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            Log.v(TAG, "[getItemId]: " + position);
+
+            return position;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
     }
 }

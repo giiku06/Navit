@@ -8,6 +8,7 @@
     android:theme="@style/Theme.Giiku06Application.AppWidgetContainer">
 
     <RelativeLayout
+        android:id="@+id/view_item"
         style="@style/Widget.Giiku06Application.AppWidget.Container"
         android:background="@drawable/shape_rounded_corners_bord"
         android:layout_width="match_parent"
