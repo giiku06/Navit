@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -41,6 +42,12 @@ public class MyWidgetService extends RemoteViewsService {
         String[] drop_off_time = {"11 : 30", "12 : 30", "13 : 30"};
         String[] route_text = {"東山線", "鶴舞線", "桜通線"};
         String[] last_station_text = {"高畑行", "上小田井行", "太閤通行"};
+        int year;
+        int month;
+        int day;
+        int hour;
+        int min;
+        Intent ClickIntent;
 
         @Override
         public void onCreate() {
@@ -57,11 +64,11 @@ public class MyWidgetService extends RemoteViewsService {
             try {
                 Context context = getApplicationContext();
                 Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH) + 1;
-                int day = calendar.get(Calendar.DATE);
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int min = calendar.get(Calendar.MINUTE);
+                year = calendar.get(Calendar.YEAR);
+                month = calendar.get(Calendar.MONTH) + 1;
+                day = calendar.get(Calendar.DATE);
+                hour = calendar.get(Calendar.HOUR_OF_DAY);
+                min = calendar.get(Calendar.MINUTE);
                 int sec = calendar.get(Calendar.SECOND);
                 @SuppressLint("DefaultLocale") String currentTime = String.format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, min, sec);
         //        位置情報の受け取り
@@ -120,11 +127,6 @@ public class MyWidgetService extends RemoteViewsService {
                 rv.setTextViewText(R.id.drop_off_time,drop_off_time[position]);
                 rv.setTextViewText(R.id.route_text,route_text[position]);
                 rv.setTextViewText(R.id.last_station_text,last_station_text[position]);
-
-                // クリックイベント
-//                Context context = getApplicationContext();
-                Intent ClickIntent = new Intent("com.example.giiku06application.CLICK_WIDGET");
-                ClickIntent.putExtra("CLICK_WIDGET", position);
 
                 rv.setOnClickFillInIntent(R.id.view_item, ClickIntent);
             }
@@ -202,7 +204,7 @@ public class MyWidgetService extends RemoteViewsService {
                     goalStationNames[i] = goalStationName;
 
                     JSONArray roadMapArray = new JSONArray();
-// SectionsArrayの1からLength-1までを切り取る（0と最後は不要なデータのため）
+                    // SectionsArrayの1からLength-1までを切り取る（0と最後は不要なデータのため）
                     for (int k = 1; k < sectionsArray.length(); k++) {
                         JSONObject sectionObject = sectionsArray.getJSONObject(k);
                         roadMapArray.put(sectionObject);
@@ -216,10 +218,10 @@ public class MyWidgetService extends RemoteViewsService {
                 String goalStationNamesString = TextUtils.join(",", goalStationNames);
 //                String roadMapArraysString = TextUtils.join(",", roadMapArrays);
 
-                Log.d("DEBUG", "from: " + fromTimesString);
-                Log.d("DEBUG", "to: " + toTimesString);
-                Log.d("DEBUG", "line: " + lineNamesString);
-                Log.d("DEBUG", "goal: " + goalStationNamesString);
+                Log.d("moldData", "from: " + fromTimesString);
+                Log.d("moldData", "to: " + toTimesString);
+                Log.d("moldData", "line: " + lineNamesString);
+                Log.d("moldData", "goal: " + goalStationNamesString);
 
                 Log.d("DEBUG", "roadMaps" + roadMapArrays.toString());
 
@@ -234,6 +236,22 @@ public class MyWidgetService extends RemoteViewsService {
                 drop_off_time = toTimesString.split(",");
                 route_text = lineNamesString.split(",");
                 last_station_text = goalStationNamesString.split(",");
+
+                ClickIntent = new Intent();
+                ClickIntent.setData(
+                    Uri.parse("https://www.navitime.co.jp/transfer/searchlist?" +
+                            "orvStationName=" + "名古屋" +
+                            "&dnvStationName=" + "金山" +
+                            "&year=" + year +
+                            "&month=" + month +
+                            "&day=" + day +
+                            "&hour=" + hour +
+                            "&minute=" + min +
+
+                            "&basis=1&freePass=0&sort=4&wspeed=100&airplane=1&sprexprs=1&utrexprs=1&othexprs=1&mtrplbus=1&intercitybus=1&ferry=1&wspeed=100&airplane=1&sprexprs=1&utrexprs=1&othexprs=1&mtrplbus=1&intercitybus=1&ferry=1"
+                    )
+                );
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
