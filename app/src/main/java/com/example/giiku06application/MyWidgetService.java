@@ -100,6 +100,7 @@ public class MyWidgetService extends RemoteViewsService {
                 }
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
+                Log.d(TAG, "fetchData: error");
             }
         }
 
@@ -189,7 +190,7 @@ public class MyWidgetService extends RemoteViewsService {
                             break; //ひとつ目が抽出出来たらループを抜ける
                         }
                     }
-                    lineNames[i] = lineName;
+                    lineNames[i] = lineName.substring(0, Math.min(lineName.length(), 8));;
 
                     // 目的地の最寄り駅の抽出処理
                     String goalStationName = "";
@@ -201,7 +202,7 @@ public class MyWidgetService extends RemoteViewsService {
                             break; // 抽出できたらループを抜ける
                         }
                     }
-                    goalStationNames[i] = goalStationName;
+                    goalStationNames[i] = goalStationName.substring(0, Math.min(goalStationName.length(), 5));
 
                     JSONArray roadMapArray = new JSONArray();
                     // SectionsArrayの1からLength-1までを切り取る（0と最後は不要なデータのため）
