@@ -1,4 +1,5 @@
 <RelativeLayout
+    android:id="@+id/view_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Widget.Giiku06Application.AppWidget.Container"
     android:background="@drawable/shape_rounded_bord_sub"

@@ -44,7 +44,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements LocationListener, OkHttpGet.OnDataReceivedListener, GetGoalPoint.OnGoalPointReceivedListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, GetGoalPoint.OnGoalPointReceivedListener {
 
     private LocationManager mLocationManager;
     private String bestProvider;
@@ -180,81 +180,81 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     // OkHttpGetからのデータ受け取り処理
-    @Override
-    public void onDataReceived(String resData) {
-        // 受け取ったJSONデータを解析するなどの処理を行う
-        try {
-            JSONObject rootJSON = new JSONObject(resData);
-            JSONArray itemsArray = rootJSON.getJSONArray("items");
-
-//            出発時刻の配列
-            String[] fromTimes = new String[itemsArray.length()];
-//            到着時刻の配列
-            String[] toTimes = new String[itemsArray.length()];
-
-//            路線名の配列
-            String[] lineNames = new String[itemsArray.length()];
-//            目的地から近い最寄り駅の配列
-            String[] goalStationNames = new String[itemsArray.length()];
-
-//            items(経路の候補)[0~2]まで回す
-            for (int i = 0; i < itemsArray.length(); i++) {
-                JSONObject item = itemsArray.getJSONObject(i);
-                JSONObject summary = item.getJSONObject("summary");
-                JSONObject move = summary.getJSONObject("move");
-
-//                日時の取得
-                String fromTime = move.getString("from_time");
-                String toTime = move.getString("to_time");
-
-//                取得日時からhh:mmのみ切り出しフォーマット→配列に格納
-                String formattedFromTime = fromTime.substring(11, 16);
-                fromTimes[i] = formattedFromTime;
-                String formattedToTime = toTime.substring(11, 16);
-                toTimes[i] = formattedToTime;
-
-//                sections部
-                JSONArray sectionsArray = item.getJSONArray("sections");
-
-//                路線名の抽出処理
-                String lineName = "";
-                for (int j = 0; j < sectionsArray.length(); j++) {
-                    JSONObject section = sectionsArray.getJSONObject(j);
-
-//                    section配列からtype:moveで、move:walkでないものを抽出
-                    if (section.getString("type").equals("move") &&
-                        !section.getString("move").equals("walk")){
-                        lineName = section.getString("line_name");
-                        break; //ひとつ目が抽出出来たらループを抜ける
-                    }
-                }
-                lineNames[i] = lineName;
-
-//                目的地の最寄り駅の抽出処理
-                String goalStationName = "";
-                for (int j = sectionsArray.length() - 1; j >= 0; j--) {
-                    JSONObject section = sectionsArray.getJSONObject(j);
-//                    section配列の後ろからtype:pointで、node_idが含まれているものを検索
-                    if (section.getString("type").equals("point") && section.has("node_id")) {
-                        goalStationName = section.getString("name");
-                        break; // 抽出できたらループを抜ける
-                    }
-                }
-                goalStationNames[i] = goalStationName;
-
-            }
-            String fromTimesString = TextUtils.join(",", fromTimes);
-            String toTimesString = TextUtils.join(",", toTimes);
-            String lineNamesString = TextUtils.join(",", lineNames);
-            String goalStationNamesString = TextUtils.join(",", goalStationNames);
-
-            Log.d("DEBUG", "from: " + fromTimesString);
-            Log.d("DEBUG", "to: " + toTimesString);
-            Log.d("DEBUG", "line: " + lineNamesString);
-            Log.d("DEBUG", "goal: " + goalStationNamesString);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
+//    @Override
+//    public void onDataReceived(String resData) {
+//        // 受け取ったJSONデータを解析するなどの処理を行う
+//        try {
+//            JSONObject rootJSON = new JSONObject(resData);
+//            JSONArray itemsArray = rootJSON.getJSONArray("items");
+//
+////            出発時刻の配列
+//            String[] fromTimes = new String[itemsArray.length()];
+////            到着時刻の配列
+//            String[] toTimes = new String[itemsArray.length()];
+//
+////            路線名の配列
+//            String[] lineNames = new String[itemsArray.length()];
+////            目的地から近い最寄り駅の配列
+//            String[] goalStationNames = new String[itemsArray.length()];
+//
+////            items(経路の候補)[0~2]まで回す
+//            for (int i = 0; i < itemsArray.length(); i++) {
+//                JSONObject item = itemsArray.getJSONObject(i);
+//                JSONObject summary = item.getJSONObject("summary");
+//                JSONObject move = summary.getJSONObject("move");
+//
+////                日時の取得
+//                String fromTime = move.getString("from_time");
+//                String toTime = move.getString("to_time");
+//
+////                取得日時からhh:mmのみ切り出しフォーマット→配列に格納
+//                String formattedFromTime = fromTime.substring(11, 16);
+//                fromTimes[i] = formattedFromTime;
+//                String formattedToTime = toTime.substring(11, 16);
+//                toTimes[i] = formattedToTime;
+//
+////                sections部
+//                JSONArray sectionsArray = item.getJSONArray("sections");
+//
+////                路線名の抽出処理
+//                String lineName = "";
+//                for (int j = 0; j < sectionsArray.length(); j++) {
+//                    JSONObject section = sectionsArray.getJSONObject(j);
+//
+////                    section配列からtype:moveで、move:walkでないものを抽出
+//                    if (section.getString("type").equals("move") &&
+//                        !section.getString("move").equals("walk")){
+//                        lineName = section.getString("line_name");
+//                        break; //ひとつ目が抽出出来たらループを抜ける
+//                    }
+//                }
+//                lineNames[i] = lineName;
+//
+////                目的地の最寄り駅の抽出処理
+//                String goalStationName = "";
+//                for (int j = sectionsArray.length() - 1; j >= 0; j--) {
+//                    JSONObject section = sectionsArray.getJSONObject(j);
+////                    section配列の後ろからtype:pointで、node_idが含まれているものを検索
+//                    if (section.getString("type").equals("point") && section.has("node_id")) {
+//                        goalStationName = section.getString("name");
+//                        break; // 抽出できたらループを抜ける
+//                    }
+//                }
+//                goalStationNames[i] = goalStationName;
+//
+//            }
+//            String fromTimesString = TextUtils.join(",", fromTimes);
+//            String toTimesString = TextUtils.join(",", toTimes);
+//            String lineNamesString = TextUtils.join(",", lineNames);
+//            String goalStationNamesString = TextUtils.join(",", goalStationNames);
+//
+//            Log.d("DEBUG", "from: " + fromTimesString);
+//            Log.d("DEBUG", "to: " + toTimesString);
+//            Log.d("DEBUG", "line: " + lineNamesString);
+//            Log.d("DEBUG", "goal: " + goalStationNamesString);
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
