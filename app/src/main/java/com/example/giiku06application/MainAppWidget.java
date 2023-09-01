@@ -20,8 +20,6 @@ public class MainAppWidget extends AppWidgetProvider{
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.main_app_widget);
             rv.setRemoteAdapter(R.id.listview, remoteViewsFactoryIntent);
 
-//            setOnItemSelectedPendingIntent(context,rv);
-
             appWidgetManager.updateAppWidget(appWidgetId, rv);
         }
 
@@ -44,18 +42,5 @@ public class MainAppWidget extends AppWidgetProvider{
             int clickedPosition = intent.getIntExtra("position", -1);
             Log.d("TAG", "onReceive: "+clickedPosition);
         }
-    }
-    private void setOnItemSelectedPendingIntent(Context ctx, RemoteViews rv) {
-        Intent itemClickIntent = new Intent(ctx, MainAppWidget.class);
-        itemClickIntent.setAction(CLICK_WIDGET);
-
-        PendingIntent itemClickPendingIntent = PendingIntent.getBroadcast(
-                ctx,
-                0,
-                itemClickIntent,
-                PendingIntent.FLAG_MUTABLE
-        );
-
-        rv.setPendingIntentTemplate(R.id.listview, itemClickPendingIntent);
     }
 }

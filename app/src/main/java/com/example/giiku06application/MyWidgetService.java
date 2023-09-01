@@ -1,7 +1,6 @@
 package com.example.giiku06application;
 
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -146,7 +145,8 @@ public class MyWidgetService extends RemoteViewsService {
                 // 目的地から近い最寄り駅の配列
                 String[] goalStationNames = new String[itemsArray.length()];
                 // 通過駅情報を格納した配列
-                JSONArray[] roadMapArrays = new JSONArray[itemsArray.length()];
+//                JSONArray[] roadMapArrays = new JSONArray[itemsArray.length()];
+                JSONArray roadMapArrays = new JSONArray();
 
 
                 //            items(経路の候補)[0~2]まで回す
@@ -207,21 +207,21 @@ public class MyWidgetService extends RemoteViewsService {
                         JSONObject sectionObject = sectionsArray.getJSONObject(k);
                         roadMapArray.put(sectionObject);
                     }
-                    roadMapArrays[i] = roadMapArray;
+                    roadMapArrays.put(i,roadMapArray);
 
                 }
                 String fromTimesString = TextUtils.join(",", fromTimes);
                 String toTimesString = TextUtils.join(",", toTimes);
                 String lineNamesString = TextUtils.join(",", lineNames);
                 String goalStationNamesString = TextUtils.join(",", goalStationNames);
-                String roadMapArraysString = TextUtils.join(",", roadMapArrays);
+//                String roadMapArraysString = TextUtils.join(",", roadMapArrays);
 
                 Log.d("DEBUG", "from: " + fromTimesString);
                 Log.d("DEBUG", "to: " + toTimesString);
                 Log.d("DEBUG", "line: " + lineNamesString);
                 Log.d("DEBUG", "goal: " + goalStationNamesString);
 
-                Log.d("DEBUG", "roadMaps" + roadMapArraysString);
+                Log.d("DEBUG", "roadMaps" + roadMapArrays.toString());
 
                 SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
