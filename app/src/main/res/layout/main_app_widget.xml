@@ -1,7 +1,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Widget.Giiku06Application.AppWidget.Container"
-    android:background="@null"
+    android:background="@drawable/shape_rounded_corners_times"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="0dp"
@@ -9,9 +9,18 @@
 
     <StackView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/listview"
+        android:alpha="1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:loopViews="true" />
+
+    <TextView
+        android:id="@+id/background"
+        android:alpha="0"
+        android:layout_width="40dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="#fff" />
 
 </RelativeLayout>
