@@ -209,6 +209,7 @@ public class MyWidgetService extends RemoteViewsService {
                         JSONObject sectionObject = sectionsArray.getJSONObject(k);
                         roadMapArray.put(sectionObject);
                     }
+                    Log.d("debug", "moldData: "+roadMapArray);
                     roadMapArrays.put(i,roadMapArray);
 
                 }
@@ -237,11 +238,13 @@ public class MyWidgetService extends RemoteViewsService {
                 route_text = lineNamesString.split(",");
                 last_station_text = goalStationNamesString.split(",");
 
+                String station = roadMapArrays.getJSONArray(0).getJSONObject(1).getString("name");
+                Log.d(TAG, "station: "+station);
                 ClickIntent = new Intent();
                 ClickIntent.setData(
                     Uri.parse("https://www.navitime.co.jp/transfer/searchlist?" +
-                            "orvStationName=" + "名古屋" +
-                            "&dnvStationName=" + "金山" +
+                            "orvStationName=" + station +
+                            "&dnvStationName=" + last_station_text[0] +
                             "&year=" + year +
                             "&month=" + month +
                             "&day=" + day +
