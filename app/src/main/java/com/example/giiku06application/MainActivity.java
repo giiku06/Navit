@@ -55,6 +55,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SharedPreferences sharedGoalPoint = getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
+        String goalPointName = sharedGoalPoint.getString("goalPointName","-1");
+        if (!goalPointName.equals("-1")){
+            TextView textView = findViewById(R.id.setting_goal_point);
+            textView.setText(goalPointName);
+        }
         initLocationManager();
         inputGoalPoint = (EditText) findViewById(R.id.input_goal_point);
     }
@@ -75,9 +81,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         try {
             JSONObject rootJSON = new JSONObject(resGoalPoint);
             JSONArray itemsArray = rootJSON.getJSONArray("items");
-
             if (itemsArray.length() > 0) {
                 JSONObject item = itemsArray.getJSONObject(0);
+                Log.d("TAG", "onGoalPointReceived: "+item.toString());
                 String goal_id = item.getString("id");
                 TextView errorMsg = findViewById(R.id.error_msg);
                 errorMsg.setVisibility(View.INVISIBLE);
@@ -86,6 +92,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 SharedPreferences sharedGoalPoint = getSharedPreferences("goal_point_pref", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedGoalPoint.edit();
                 editor.putString("goalPoint", goal_id);
+                String goalPointName = item.getString("name");
+                editor.putString("goalPointName", goalPointName);
+                TextView textView = findViewById(R.id.setting_goal_point);
+                textView.setText(goalPointName);
                 editor.apply();
 
                 Log.d("DEBUG", "goal_id :" + goal_id);
