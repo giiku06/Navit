@@ -201,6 +201,13 @@ public class MyWidgetService extends RemoteViewsService {
                     }
                     goalStationNames[i] = goalStationName;
 
+                    JSONArray roadMapArray = new JSONArray();
+// SectionsArrayの1からLength-1までを切り取る（0と最後は不要なデータのため）
+                    for (int k = 1; k < sectionsArray.length(); k++) {
+                        JSONObject sectionObject = sectionsArray.getJSONObject(k);
+                        roadMapArray.put(sectionObject);
+                    }
+                    roadMapArrays[i] = roadMapArray;
 
                 }
                 String fromTimesString = TextUtils.join(",", fromTimes);
@@ -213,6 +220,13 @@ public class MyWidgetService extends RemoteViewsService {
                 Log.d("DEBUG", "to: " + toTimesString);
                 Log.d("DEBUG", "line: " + lineNamesString);
                 Log.d("DEBUG", "goal: " + goalStationNamesString);
+
+                Log.d("DEBUG", "roadMaps" + roadMapArraysString);
+
+                SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("roadMaps", roadMapArrays.toString());
+                editor.apply();
 
 
                 //listに渡すデータの作成
