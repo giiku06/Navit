@@ -87,6 +87,8 @@ public class MyWidgetService extends RemoteViewsService {
                 try (Response response = httpClient.newCall(request).execute()) {
                     String responseStr = Objects.requireNonNull(response.body()).string();
                     JSONObject rootJSON = new JSONObject(responseStr);
+
+//                    JSON生データの格納
                     jsons = rootJSON.getJSONArray("items");
                     moldData();
                 }
@@ -134,54 +136,64 @@ public class MyWidgetService extends RemoteViewsService {
         private void moldData() {
             try {
                 JSONArray itemsArray = jsons;
-                //            出発時刻の配列
+                // 出発時刻の配列
                 String[] fromTimes = new String[itemsArray.length()];
-                //            到着時刻の配列
+                // 到着時刻の配列
                 String[] toTimes = new String[itemsArray.length()];
 
-                //            路線名の配列
+                // 路線名の配列
                 String[] lineNames = new String[itemsArray.length()];
-                //            目的地から近い最寄り駅の配列
+                // 目的地から近い最寄り駅の配列
                 String[] goalStationNames = new String[itemsArray.length()];
+                // 通過駅情報を格納した配列
+                JSONArray[] roadMapArrays = new JSONArray[itemsArray.length()];
+
 
                 //            items(経路の候補)[0~2]まで回す
                 for (int i = 0; i < itemsArray.length(); i++) {
                     JSONObject item = itemsArray.getJSONObject(i);
+
+                    // itemsの中のSummary→Summaryの中のmoveを抽出
                     JSONObject summary = item.getJSONObject("summary");
                     JSONObject move = summary.getJSONObject("move");
 
-                    //                日時の取得
-                    String fromTime = move.getString("from_time");
-                    String toTime = move.getString("to_time");
+                    //sections部（スタートからゴールまでの全ての通過点を抽出）
+                    JSONArray sectionsArray = item.getJSONArray("sections");
 
-                    //                取得日時からhh:mmのみ切り出しフォーマット→配列に格納
-                    String formattedFromTime = fromTime.substring(11, 16);
-                    fromTimes[i] = formattedFromTime;
+                    // 到着時間をmove>to_timeから取得
+                    String toTime = move.getString("to_time");
+                    //　取得日時からhh:mmのみ切り出しフォーマット→配列に格納
                     String formattedToTime = toTime.substring(11, 16);
                     toTimes[i] = formattedToTime;
 
-                    //                sections部
-                    JSONArray sectionsArray = item.getJSONArray("sections");
-
-                    //                路線名の抽出処理
+                    // 路線名の抽出処理
                     String lineName = "";
+//                    sections部の中の各sectionを順番に閲覧
                     for (int j = 0; j < sectionsArray.length(); j++) {
                         JSONObject section = sectionsArray.getJSONObject(j);
 
-                        //                    section配列からtype:moveで、move:walkでないものを抽出
+                        // section配列からtype:moveで、move:walkでないものを抽出
                         if (section.getString("type").equals("move") &&
                                 !section.getString("move").equals("walk")) {
                             lineName = section.getString("line_name");
+
+                            JSONObject rideOnSection = sectionsArray.getJSONObject(j);
+                            // 電車乗車時間であるsections>乗車駅＋1>from_timeから取得に変更する
+                            String fromTime = rideOnSection.getString("from_time");
+                            //　取得日時からhh:mmのみ切り出しフォーマット→配列に格納
+                            String formattedFromTime = fromTime.substring(11, 16);
+                            fromTimes[i] = formattedFromTime;
+
                             break; //ひとつ目が抽出出来たらループを抜ける
                         }
                     }
                     lineNames[i] = lineName;
 
-                    //                目的地の最寄り駅の抽出処理
+                    // 目的地の最寄り駅の抽出処理
                     String goalStationName = "";
                     for (int j = sectionsArray.length() - 1; j >= 0; j--) {
                         JSONObject section = sectionsArray.getJSONObject(j);
-                        //                    section配列の後ろからtype:pointで、node_idが含まれているものを検索
+                        // section配列の後ろからtype:pointで、node_idが含まれているものを検索
                         if (section.getString("type").equals("point") && section.has("node_id")) {
                             goalStationName = section.getString("name");
                             break; // 抽出できたらループを抜ける
@@ -189,23 +201,39 @@ public class MyWidgetService extends RemoteViewsService {
                     }
                     goalStationNames[i] = goalStationName;
 
+                    JSONArray roadMapArray = new JSONArray();
+// SectionsArrayの1からLength-1までを切り取る（0と最後は不要なデータのため）
+                    for (int k = 1; k < sectionsArray.length(); k++) {
+                        JSONObject sectionObject = sectionsArray.getJSONObject(k);
+                        roadMapArray.put(sectionObject);
+                    }
+                    roadMapArrays[i] = roadMapArray;
+
                 }
                 String fromTimesString = TextUtils.join(",", fromTimes);
                 String toTimesString = TextUtils.join(",", toTimes);
                 String lineNamesString = TextUtils.join(",", lineNames);
                 String goalStationNamesString = TextUtils.join(",", goalStationNames);
+                String roadMapArraysString = TextUtils.join(",", roadMapArrays);
 
                 Log.d("DEBUG", "from: " + fromTimesString);
                 Log.d("DEBUG", "to: " + toTimesString);
                 Log.d("DEBUG", "line: " + lineNamesString);
                 Log.d("DEBUG", "goal: " + goalStationNamesString);
 
+                Log.d("DEBUG", "roadMaps" + roadMapArraysString);
+
+                SharedPreferences sharedPreferences = getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("roadMaps", roadMapArrays.toString());
+                editor.apply();
+
+
                 //listに渡すデータの作成
                 ride_time = fromTimesString.split(",");
                 drop_off_time = toTimesString.split(",");
                 route_text = lineNamesString.split(",");
                 last_station_text = goalStationNamesString.split(",");
-                Log.d("ride_time", "onDataReceived: " + ride_time[0]);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
