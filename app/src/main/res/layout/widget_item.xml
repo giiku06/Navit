@@ -1,28 +1,29 @@
-<RelativeLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/view_item"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Widget.Giiku06Application.AppWidget.Container"
-    android:background="@drawable/shape_rounded_bord_sub"
     android:layout_width="match_parent"
     android:layout_height="80dp"
+    android:background="@drawable/shape_rounded_bord_sub"
     android:padding="0dp"
     android:theme="@style/Theme.Giiku06Application.AppWidgetContainer">
 
     <RelativeLayout
         style="@style/Widget.Giiku06Application.AppWidget.Container"
-        android:background="@drawable/shape_rounded_corners_bord"
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="0dp"
+        android:background="@drawable/shape_rounded_corners_bord"
         android:padding="8dp"
-        android:layout_centerInParent="true"
         android:theme="@style/Theme.Giiku06Application.AppWidgetContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center"
-            android:padding="0dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="0dp">
 
             <ImageView
                 android:layout_width="36dp"
@@ -36,43 +37,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:padding="8dp"
-                android:textColor="@color/black"
-                android:textSize="16dp"
-                android:layout_marginRight="4dp"
                 android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
                 android:background="@drawable/shape_rounded_corners_times"
-                android:text="00 : 00" />
+                android:padding="8dp"
+                android:text="00 : 00"
+                android:textColor="@color/black"
+                android:textSize="16dp" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="180dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/route_text"
                     android:layout_width="wrap_content"
-                    android:layout_height="16dp"
-                    android:text="ーー線"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:textColor="@color/white"/>
+                    android:text="ーー線"
+                    android:textColor="@color/white" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="36dp">
+                    android:layout_height="32dp">
 
                     <ImageView
                         android:id="@+id/widget_item"
-                        android:background="@null"
-                        android:layout_width="112dp"
-                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="32dp"
                         android:layout_gravity="center_vertical"
+                        android:background="@null"
                         android:scaleType="fitXY"
                         android:src="@drawable/stationbord" />
 
                     <TextView
                         android:id="@+id/last_station_text"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="32dp"
                         android:layout_centerInParent="true"
                         android:background="@null"
                         android:text="ーー行"
