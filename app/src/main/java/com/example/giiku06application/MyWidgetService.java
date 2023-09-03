@@ -32,8 +32,6 @@ public class MyWidgetService extends RemoteViewsService {
     private class NavitWidgetFactory implements RemoteViewsFactory {
 
         private static final String TAG = "NavitViewFactory";
-        private static final String API_HOST = "navitime-route-totalnavi.p.rapidapi.com";
-        private static final String API_KEY = "ee6978f011mshb71e6fca9594701p1c2bcbjsn3aa55c5144d5";
 
         private JSONArray jsons = new JSONArray();
 
