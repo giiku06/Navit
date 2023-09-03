@@ -10,6 +10,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class GetGoalPoint extends AsyncTask<String, String, String> {
+    private static final String API_HOST = "navitime-transport.p.rapidapi.com";
+    private static final String API_KEY = "ee6978f011mshb71e6fca9594701p1c2bcbjsn3aa55c5144d5";    
     private String keyWord;
 
     // コールバックインターフェースの定義
